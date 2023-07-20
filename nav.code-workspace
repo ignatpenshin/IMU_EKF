@@ -1,0 +1,26 @@
+{
+    "folders": [
+      {
+        "path": "."
+      },
+    ],
+    "settings": {
+      "python.analysis.diagnosticMode": "openFilesOnly",
+      "python.analysis.typeCheckingMode": "strict",
+      "python.linting.enabled": true,
+      "python.linting.flake8Enabled": true,
+      "python.formatting.provider": "black",
+      "python.languageServer": "Pylance",
+      "python.analysis.autoImportCompletions": true,
+      "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+      ],
+      "python.analysis.indexing": true,
+      "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingTypeStubs": "information",
+      },
+    },
+    "extensions": {
+      "recommendations": []
+    }
+  }
