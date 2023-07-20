@@ -90,7 +90,7 @@ class Plotter:
         return art3d.Poly3DCollection(sides, facecolors=np.repeat(color, 6), **kwargs)
 
     def R_from_q(self, q: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        orientation = np.deg2rad(orientation)
+        orientation = np.deg2rad(q)
 
         ca, cb, cg = np.cos(orientation)
         sa, sb, sg = np.sin(orientation)

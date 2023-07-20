@@ -7,7 +7,7 @@ dynamic = ["dependencies", "version"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-version = {attr = "0.1a"}
+version = {attr = "v0.1a"}
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
