@@ -19,7 +19,6 @@ class Pose:
         self.orix.append(orin.T[0, :])
         self.oriy.append(orin.T[1, :])
         self.oriz.append(orin.T[2, :])
-        print(self.pose)
         self.plotter.plot_orientation(orin, pose, history=np.vstack(self.pose))
 
 
