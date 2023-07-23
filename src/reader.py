@@ -7,6 +7,8 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 
+from src.mathUtils import AxisOrder
+
 
 class AsyncIMU:
     def __init__(self, path: str, filename: str):
@@ -58,10 +60,10 @@ class ReadIMU:
             case "q":
                 return self._data[self._config["q"]]
             case "g":
-                return self._data[self._config["g"]]
+                return AxisOrder(self._data[self._config["g"]])
             case "w":
-                return self._data[self._config["w"]]
+                return AxisOrder(self._data[self._config["w"]])
             case "m":
-                return self._data[self._config["m"]]
+                return AxisOrder(self._data[self._config["m"]])
             case _:
-                return self._data
+                return np.hstack(self.data(x) for x in self.get_config().keys())

@@ -2,97 +2,93 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-import scipy.signal
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial.transform import Slerp
 
 
-class CalcUtils:
-    @staticmethod
-    def rollAcc(acc: npt.NDArray[np.float64]) -> float:
-        return np.rad2deg(np.arctan(acc[2] / np.hypot(acc[0], acc[1])))
+def rollAcc(acc: npt.NDArray[np.float64]) -> float:
+    return np.rad2deg(np.arctan(acc[2] / np.hypot(acc[0], acc[1])))
 
-    @staticmethod
-    def pitchAcc(acc: npt.NDArray[np.float64]) -> float:
-        return np.rad2deg(np.arctan(-acc[0] / np.hypot(acc[1], acc[2])))
 
-    @staticmethod
-    def rollGyro(rollPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
-        return rollPrev + gyro[2] * dt
+def pitchAcc(acc: npt.NDArray[np.float64]) -> float:
+    return np.rad2deg(np.arctan(-acc[0] / np.hypot(acc[1], acc[2])))
 
-    @staticmethod
-    def pitchGyro(pitchPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
-        return pitchPrev + gyro[0] * dt
 
-    @staticmethod
-    def ComplementaryFilter(x: float, y: float, alpha: float) -> float:
-        return alpha * x + (1 - alpha) * y
+def rollGyro(rollPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
+    return rollPrev + gyro[2] * dt
 
-    @staticmethod
-    def yawMag(roll: float, pitch: float, mag: npt.NDArray[np.float64]) -> float | None:
-        magX: np.float = mag[1] * np.sin(pitch) + mag[2] * np.cos(pitch)
 
-        magY: np.float = (
-            mag[0] * np.cos(roll)
-            + mag[2] * np.sin(roll) * np.sin(pitch)
-            - mag[1] * np.sin(roll) * np.cos(pitch)
-        )
+def pitchGyro(pitchPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
+    return pitchPrev + gyro[0] * dt
 
-        return np.rad2deg(np.arctan2(-magY, magX))
 
-    @staticmethod
-    def EulerToQuaternion(euler: list[float]) -> npt.NDArray[np.float64]:
-        r: R = R.from_euler("zxy", euler, degrees=True)
-        return r.as_quat()
+def ComplementaryFilter(x: float, y: float, alpha: float) -> float:
+    return alpha * x + (1 - alpha) * y
 
-    @staticmethod
-    def QuaternionToEuler(quat: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        r: R = R.from_quat(quat)
-        return r.as_euler("zxy", degrees=True)
 
-    @staticmethod
-    def QuaternionMotionDelta(
-        quat: npt.NDArray[np.float64], gyro: npt.NDArray[np.float64], dt: float
-    ) -> npt.NDArray[np.float64]:
-        dQ = np.array(
+def yawMag(roll: float, pitch: float, mag: npt.NDArray[np.float64]) -> float | None:
+    magX: np.float = mag[1] * np.sin(pitch) + mag[2] * np.cos(pitch)
+    magY: np.float = (
+        mag[0] * np.cos(roll)
+        + mag[2] * np.sin(roll) * np.sin(pitch)
+        - mag[1] * np.sin(roll) * np.cos(pitch)
+    )
+    return np.rad2deg(np.arctan2(-magY, magX))
+
+
+def EulerToQuaternion(euler: list[float]) -> npt.NDArray[np.float64]:
+    r: R = R.from_euler("zxy", euler, degrees=True)
+    return r.as_quat()
+
+
+def QuaternionToEuler(quat: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    r: R = R.from_quat(quat)
+    return r.as_euler("zxy", degrees=True)
+
+
+def QuaternionMotionDelta(
+    quat: npt.NDArray[np.float64], gyro: npt.NDArray[np.float64], dt: float
+) -> npt.NDArray[np.float64]:
+    dQ = np.array(
+        [
+            [-quat[1], -quat[2], -quat[3]],
+            [quat[0], -quat[3], quat[2]],
+            [quat[3], quat[0], -quat[1]],
+            [-quat[2], quat[1], quat[0]],
+        ]
+    )
+
+    return 0.5 * dt * dQ @ gyro.T
+
+
+def QuaternionMotionAppend(
+    quat_: npt.NDArray[np.float64], gyro: npt.NDArray[np.float64], dt: float
+) -> npt.NDArray[np.float64]:
+    q_ = quat_ + CalcUtils.QuaternionMotionDelta(quat_, gyro, dt)
+    return q_ / np.linalg.norm(q_, 2)
+
+
+def QuaternionToRotationMatrix(
+    quat: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
+    r: R = R.from_quat(quat)
+    return r.as_matrix()
+
+
+def Slerp(
+    q1: npt.NDArray[np.float64], q2: npt.NDArray[np.float64], p: float
+) -> npt.NDArray[np.float64]:
+    rotations = np.array([R.from_quat([q1]), R.from_quat([q2])])
+    times = np.array([0, 1])
+    slerp = Slerp(times, rotations)
+
+    return slerp(
+        np.array(
             [
-                [-quat[1], -quat[2], -quat[3]],
-                [quat[0], -quat[3], quat[2]],
-                [quat[3], quat[0], -quat[1]],
-                [-quat[2], quat[1], quat[0]],
+                p,
             ]
         )
-
-        return 0.5 * dt * dQ @ gyro.T
-
-    @staticmethod
-    def QuaternionMotionAppend(
-        quat_: npt.NDArray[np.float64], gyro: npt.NDArray[np.float64], dt: float
-    ) -> npt.NDArray[np.float64]:
-        q_ = quat_ + CalcUtils.QuaternionMotionDelta(quat_, gyro, dt)
-        return q_ / np.linalg.norm(q_, 2)
-
-    @staticmethod
-    def QuaternionToRotationMatrix(
-        quat: npt.NDArray[np.float64],
-    ) -> npt.NDArray[np.float64]:
-        r: R = R.from_quat(quat)
-        return r.as_matrix()
-
-    @staticmethod
-    def Slerp(
-        q1: npt.NDArray[np.float64], q2: npt.NDArray[np.float64], p: float
-    ) -> npt.NDArray[np.float64]:
-        rotations = np.array([R.from_quat([q1]), R.from_quat([q2])])
-        times = np.array([0, 1])
-        slerp = Slerp(times, rotations)
-        return slerp(
-            np.array(
-                [
-                    p,
-                ]
-            )
-        ).as_euler("zxy", degrees=True)
+    ).as_euler("zxy", degrees=True)
 
 
 def normalized(x: Any) -> Any:
@@ -201,3 +197,8 @@ def H(
     H2 = Hhelper(q, mn)
 
     return np.vstack((-H1, H2))
+
+
+def AxisOrder(data: npt.NDArray[np.float64]):
+    R = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]])
+    return R @ data.T
