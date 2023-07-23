@@ -9,7 +9,6 @@ class Runner:
     def run(self):
         while True:
             R, pose = self.tracker.track()
-            print(R, pose)
 
 
 if __name__ == "__main__":

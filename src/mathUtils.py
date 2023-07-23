@@ -200,8 +200,8 @@ def H(
 
 
 def AxisOrder(data: npt.NDArray[np.float64]):
-    R = np.array([[0, 0, -1], 
-                  [1, 0, 0], 
+    R = np.array([[0, 0, 1], 
+                  [-1, 0, 0], 
                   [0, -1, 0]])
     
     return R @ data.T

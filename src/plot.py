@@ -51,9 +51,9 @@ class Plotter:
 
         self.ax.clear()
         # self.ax.add_collection3d(pc)
-        # self.ax.set_xlim3d(-5, 5) #1.5
-        # self.ax.set_ylim3d(-5, 5)
-        # self.ax.set_zlim3d(-5, 5)
+        # self.ax.set_xlim3d(-50, 50) #1.5
+        # self.ax.set_ylim3d(-50, 50)
+        # self.ax.set_zlim3d(-50, 50)
         self.plot_axes(coords, T)
         self.ax.plot(history[:, 0], history[:, 1], history[:, 2], "o")
 

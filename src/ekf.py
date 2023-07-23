@@ -188,4 +188,12 @@ class EKF:
         self.v = self.v + an * self.dt
         self.p = self.p + self.v * self.dt + 0.5 * an * self.dt**2
 
+        print("-----------------")
+        print("Gn: ", self.gn)
+        print("At: ", at)
+        print("An: ", an)
+        print("V: ", self.v)
+        print("P: ", self.p)
+        print("-----------------")
+
         return orin, self.p
