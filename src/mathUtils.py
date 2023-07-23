@@ -64,7 +64,7 @@ def QuaternionMotionDelta(
 def QuaternionMotionAppend(
     quat_: npt.NDArray[np.float64], gyro: npt.NDArray[np.float64], dt: float
 ) -> npt.NDArray[np.float64]:
-    q_ = quat_ + CalcUtils.QuaternionMotionDelta(quat_, gyro, dt)
+    q_ = quat_ + QuaternionMotionDelta(quat_, gyro, dt)
     return q_ / np.linalg.norm(q_, 2)
 
 
