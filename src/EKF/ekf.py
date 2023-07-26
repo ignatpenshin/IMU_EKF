@@ -15,7 +15,7 @@ class Initializer:
         self.inited: bool = False
         self._size: int = size
         self._data: list[npt.NDArray[np.float64] | None] = []
-        self.noise_coefficient: dict[str, float] = {"w": 100.0, "a": 100.0, "m": 10.0}
+        self.noise_coefficient: dict[str, float] = {"w": 50.0, "a": 50.0, "m": 50.0}
 
     def collect(
         self, imu_vector: npt.NDArray[np.float64]

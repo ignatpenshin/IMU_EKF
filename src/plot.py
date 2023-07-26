@@ -54,7 +54,7 @@ class Plotter:
         # self.ax.set_ylim3d(-50, 50)
         # self.ax.set_zlim3d(-50, 50)
         self.plot_axes(coords, T)
-        self.ax.plot(history[-30:, 0], history[-30:, 1], history[-30:, 2], "o")
+        self.ax.plot(history[-300:, 0], history[-300:, 1], history[-300:, 2], "o")
 
         plt.pause(self.T)
 
