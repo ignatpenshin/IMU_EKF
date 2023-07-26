@@ -7,7 +7,7 @@ from scipy.spatial.transform import Slerp
 
 
 def rollAcc(acc: npt.NDArray[np.float64]) -> float:
-    return np.rad2deg(np.arctan(acc[2] / np.hypot(acc[0], acc[1])))
+    return np.rad2deg(np.arctan(acc[1] / np.hypot(acc[0], acc[2])))
 
 
 def pitchAcc(acc: npt.NDArray[np.float64]) -> float:
@@ -15,11 +15,11 @@ def pitchAcc(acc: npt.NDArray[np.float64]) -> float:
 
 
 def rollGyro(rollPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
-    return rollPrev + gyro[2] * dt
+    return rollPrev + gyro[0] * dt
 
 
 def pitchGyro(pitchPrev: float, gyro: npt.NDArray[np.float64], dt: float) -> float:
-    return pitchPrev + gyro[0] * dt
+    return pitchPrev + gyro[1] * dt
 
 
 def ComplementaryFilter(x: float, y: float, alpha: float) -> float:
@@ -27,23 +27,23 @@ def ComplementaryFilter(x: float, y: float, alpha: float) -> float:
 
 
 def yawMag(roll: float, pitch: float, mag: npt.NDArray[np.float64]) -> float | None:
-    magX: np.float = mag[1] * np.sin(pitch) + mag[2] * np.cos(pitch)
+    magX: np.float = mag[2] * np.sin(roll) - mag[1] * np.cos(roll)
     magY: np.float = (
         mag[0] * np.cos(roll)
-        + mag[2] * np.sin(roll) * np.sin(pitch)
-        - mag[1] * np.sin(roll) * np.cos(pitch)
+        + mag[1] * np.sin(pitch) * np.sin(roll)
+        + mag[2] * np.sin(pitch) * np.sin(roll)
     )
-    return np.rad2deg(np.arctan2(-magY, magX))
+    return np.rad2deg(np.arctan2(magY, magX))
 
 
 def EulerToQuaternion(euler: list[float]) -> npt.NDArray[np.float64]:
-    r: R = R.from_euler("zxy", euler, degrees=True)
+    r: R = R.from_euler("xyz", euler, degrees=True)
     return r.as_quat()
 
 
 def QuaternionToEuler(quat: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     r: R = R.from_quat(quat)
-    return r.as_euler("zxy", degrees=True)
+    return r.as_euler("xyz", degrees=True)
 
 
 def QuaternionMotionDelta(
@@ -83,12 +83,8 @@ def Slerp(
     slerp = Slerp(times, rotations)
 
     return slerp(
-        np.array(
-            [
-                p,
-            ]
-        )
-    ).as_euler("zxy", degrees=True)
+        np.array([p,])
+    ).as_euler("xyz", degrees=True)
 
 
 def normalized(x: Any) -> Any:

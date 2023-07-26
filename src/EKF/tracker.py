@@ -5,7 +5,7 @@ from src.mathUtils import *
 from src.reader import ReadIMU
 from src.imu import IMU
 from src.plot import Pose
-from src.ekf import Initializer, EKF
+from src.EKF.ekf import Initializer, EKF
 
 
 class Tracker:
@@ -52,5 +52,6 @@ class Tracker:
     def track(self):
         wt, at, mt = self._data_prepare(next(self.get_imu()))
         orin, pos = self.ekf.process(wt, at, mt)
+        #print(orin, pos)
         self.pose.append_data(orin, pos)
         return orin, pos

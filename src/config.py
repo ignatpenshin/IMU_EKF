@@ -1,3 +1,3 @@
 class Vars:
     PATH: str = "data"
-    FILE: str = "imu.txt"
+    FILE: str = "imu_static.txt"

@@ -55,7 +55,7 @@ class ReadIMU:
     def update(self) -> npt.NDArray[np.float64]:
         self._read_imu()
 
-    def data(self, val: Optional[str] = None) -> npt.NDArray[np.float64]:
+    def data(self, val: Optional[str] = None) -> tuple[npt.NDArray[np.float64]]:
         match val:
             case "q":
                 return self._data[self._config["q"]]

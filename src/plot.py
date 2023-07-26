@@ -26,7 +26,7 @@ class Plotter:
     def __init__(self, T: float = 1 / 25):
         self.T = T
         plt.ion()
-        self.fig = plt.figure(figsize=(8, 8))
+        self.fig = plt.figure(figsize=(1.5, 1.5))
         self.ax = self.fig.add_subplot(111, projection="3d")
         self.dims = np.array([0.8, 0.4, 0.1])
 
@@ -47,7 +47,6 @@ class Plotter:
 
         ## Get local axis coordinates and phone cuboid
         coords = R @ normals
-        # pc = self.cuboid(coords, color = 'black', alpha = 0.3)
 
         self.ax.clear()
         # self.ax.add_collection3d(pc)
@@ -55,38 +54,9 @@ class Plotter:
         # self.ax.set_ylim3d(-50, 50)
         # self.ax.set_zlim3d(-50, 50)
         self.plot_axes(coords, T)
-        self.ax.plot(history[:, 0], history[:, 1], history[:, 2], "o")
+        self.ax.plot(history[-30:, 0], history[-30:, 1], history[-30:, 2], "o")
 
         plt.pause(self.T)
-
-    def cuboid(self, coords, color, **kwargs):
-        """
-        art3d.Poly3DCollection
-        A cuboid representing the IMU.
-        """
-
-        pm = np.array([-1, 1])
-        sides = []
-
-        # Get the direction vector for the phone.
-        us = self.dims[None, :] * coords
-
-        # Get each side (3 x 2 directions)
-        for i in range(3):
-            for direct in pm:
-                center = direct * us[:, i] * 0.5
-                j, k = [l for l in range(3) if not l == i]
-
-                # Get the corners for each edge
-                corners = []
-                for directj, directk in zip([-1, -1, 1, 1], [1, -1, -1, 1]):
-                    corners.append(
-                        center + 0.5 * us[:, j] * directj + 0.5 * us[:, k] * directk
-                    )
-                sides.append(corners)
-
-        sides = np.array(sides).astype(float)
-        return art3d.Poly3DCollection(sides, facecolors=np.repeat(color, 6), **kwargs)
 
     def R_from_q(self, q: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         orientation = np.deg2rad(q)
